@@ -1,33 +1,23 @@
 <?php
-		function print_set($reg,$pass){
-
-			while(($row=$reg->fetch_assoc())!=false){
-				if($row!=NULL) echo "test";
-				if ($pass==$row['pass']) header("Location: test.php?send=1");
-				if ($pass!=$row['pass']) {
-					$error="Неверный пароль!";
-					return $error;
-				}
-				}
-		}
 	//session_start();
 	if(isset($_POST["enter"])){
 		$login=$_POST["login"];
 		$pass=MD5($_POST["pass"]);
-		global $error;
-		$error="";
-	
+		if ($login=="") {
+			$error="Введите логин!";
+		}
 		$mysqli = new mysqli("localhost","root","","db");
 		$mysqli->query("SET NAMES 'utf8'");
-		$reg = $mysqli->query("SELECT * FROM `users` WHERE `login` LIKE '$login'");
-		if ($login=="") $error="Введите логин!";
-		print_set($reg,$pass);
-		
-		/*$mysqli->query ("INSERT INTO `db`.`users` (`id`, `login`, `pass`, `date`) VALUES (NULL, '$login', MD5('$pass'), UNIX_TIMESTAMP())");*/
+		$reg = $mysqli->query("SELECT * FROM `users`");
+			while(($row=$reg->fetch_assoc())!=false){
+				if ($login==$row['login']&&$pass==$row['pass']){
+					header("Location: welcom.php?send=1");
+				}
+				if ($login==$row['login']&&$pass!=$row['pass']){
+					$error="Неверно введен пароль!";
+				}
+			}
 		$mysqli->close();
-
-
-
 		}
 ?>
 
@@ -47,7 +37,7 @@
 		<input type="text" name="pass" id="pass" placeholder="Введите пароль..."><br>
 		</div>
 		<div class="left">
-			<a href="">Регистрация</a>
+			<a href="add.php">Регистрация</a>
 		</div>
 		<div class="right">
 			<input id="submit" type="submit" name="enter" value="Войти">
@@ -55,6 +45,6 @@
 	</div>
 
 	</form>
-	<p align="center"><?=$error?></p>
+	<p align="center" style="color: red"><?=$error?></p>
 </body>
 </html>
